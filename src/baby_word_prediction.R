@@ -49,13 +49,16 @@ df <- get_instrument_data(language = "English (American)",
 
 start_produce <-
   df %>%
-  mutate(produces = value == "produces") %>%
-  group_by(num_item_id) %>%
-  inner_join(words, by = "num_item_id") %>%
-  summarize(median = median(age))
+  select(num_item_id, value, age, language) %>%
+  filter(value == "produces") %>%
+  inner_join(starting_sound, by = "num_item_id") %>%
+  mutate(start = factor(start, letters))
 
-plot(start_produce$median, start_produce$start)
+mean_age <-
+  start_produce %>%
+  group_by(start) %>%
+  summarize(mean = mean(age))
 
-words
+head(arrange(mean_age, mean))
 
-df
+qplot(mean_age$start, mean_age$mean)
